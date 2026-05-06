@@ -12,3 +12,4 @@ export TARGET_LIBS =
 
 export PROJECT_DIR = $(abspath .)
 export BUILD_DIR = $(abspath build)
+export IMAGE_DIR = $(abspath image)

@@ -30,7 +30,7 @@ ebr_drive_number:           db 0
 ebr_signature:              db 0x29
 ebr_volume_id:              db 1, 2, 3, 4
 ebr_volume_label:           db 'OS 16      '
-ebr_system_id:              db 'FAT12   '
+ebr_system_id:              db 'FAT16   '
 
 times 90-($-$$) db 0
 
