@@ -1,37 +1,23 @@
-org 0x500
 bits 16
 
-%define ENDL 0xA, 0xD
+section .entry
+
+extern cstart_
+global start
 
 start:
-    mov si, msg
-    call print
+    cli
+    ; setup stack
+    mov ax, ds
+    mov ss, ax
+    mov sp, 0xFFF0
+    mov bp, sp
+    sti
+
+    ; expect boot drive in dl, send it as argument to cstart function
+    xor dh, dh
+    push dx
+    call cstart_
 
     cli
     hlt
-
-print:
-    ; save registers we will modify
-    push si
-    push ax
-    push bx
-
-.loop:
-    lodsb               ; loads next character in al
-    or al, al           ; verify if next character is null?
-    jz .done
-
-    mov ah, 0xE         ; call bios interrupt
-    mov bh, 0           ; set page number to 0
-    int 0x10
-
-    jmp .loop
-
-.done:
-    pop bx
-    pop ax
-    pop si
-
-    ret
-
-msg: db 'Hello world from stage2!', ENDL, 0
