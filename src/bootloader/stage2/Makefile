@@ -1,5 +1,5 @@
 ASMFLAGS += -f elf
-TARGET_CFLAGS += -ffreestanding -nostdlib -mcmodel=small "-D_cdecl=__attribute__((cdecl))"
+TARGET_CFLAGS += -ffreestanding -nostdlib -mcmodel=small "-D_cdecl=__attribute__((cdecl))" "-Dfar=__far"
 TARGET_LIBS += -lgcc
 TARGET_LINKFLAGS += -T linker.ld -nostdlib -mcmodel=small
 

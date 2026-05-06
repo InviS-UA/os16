@@ -3,10 +3,12 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/bootloader/stage2/**"
             ],
             "defines": [
-                "_cdecl="
+                "_cdecl=",
+                "far="
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c99",
