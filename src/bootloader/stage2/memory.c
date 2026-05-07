@@ -1,9 +1,9 @@
 #include "memory.h"
 
-void* memcpy(void* dst, const void* src, size_t num)
+void far* memcpy(void far* dst, const void far* src, size_t num)
 {
-    uint8_t* u8Dst = (uint8_t*)dst;
-    const uint8_t* u8Src = (const uint8_t*)src;
+    uint8_t far* u8Dst = (uint8_t far*)dst;
+    const uint8_t far* u8Src = (const uint8_t far*)src;
 
     for (size_t i = 0; i < num; i++)
         u8Dst[i] = u8Src[i];
@@ -11,9 +11,9 @@ void* memcpy(void* dst, const void* src, size_t num)
     return dst;
 }
 
-void* memset(void* ptr, int value, size_t num)
+void far* memset(void far* ptr, int value, size_t num)
 {
-    uint8_t* u8Ptr = (uint8_t*)ptr;
+    uint8_t far* u8Ptr = (uint8_t far*)ptr;
 
     for (size_t i = 0; i < num; i++)
         u8Ptr[i] = (uint8_t)value;
@@ -21,10 +21,10 @@ void* memset(void* ptr, int value, size_t num)
     return ptr;
 }
 
-int memcmp(const void* ptr1, const void* ptr2, size_t num)
+int memcmp(const void far* ptr1, const void far* ptr2, size_t num)
 {
-    const uint8_t* u8Ptr1 = (const uint8_t*)ptr1;
-    const uint8_t* u8Ptr2 = (const uint8_t*)ptr2;
+    const uint8_t far* u8Ptr1 = (const uint8_t far*)ptr1;
+    const uint8_t far* u8Ptr2 = (const uint8_t far*)ptr2;
 
     for (size_t i = 0; i < num; i++)
         if (u8Ptr1[i] != u8Ptr2[i])

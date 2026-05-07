@@ -1,13 +1,10 @@
 #include <stdint.h>
 #include "stdio.h"
 #include "disk.h"
-
-uint8_t far* data = (uint8_t far*)0x20000000;
+#include "fat.h"
 
 void _cdecl cstart_(uint16_t bootDrive)
 {
-    printf("Hello world from C!\r\n");
-
     DISK disk;
 
     if (!DISK_Init(&disk, bootDrive))
@@ -16,14 +13,21 @@ void _cdecl cstart_(uint16_t bootDrive)
         goto end;
     }
 
-    if (!DISK_ReadSectors(&disk, 0, 1, data))
+    if (!FAT_Init(&disk))
     {
-        printf("Cannot read from disk!\r\n");
+        printf("Cannot init FAT!\r\n");
         goto end;
     }
 
-    for (int i = 0; i < 512; i++)
-        putc(data[i]);
+    FAT_File far* file = FAT_Open(&disk, "test.txt");
+    char buff[100];
+
+    uint32_t read = FAT_Read(&disk, file, sizeof(buff), buff);
+
+    for (int i = 0; i < read; i++)
+        putc(buff[i]);
+
+    FAT_Close(file);
 
 end:
     for (;;);

@@ -3,6 +3,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-void* memcpy(void* dst, const void* src, size_t num);
-void* memset(void* ptr, int value, size_t num);
-int memcmp(const void* ptr1, const void* ptr2, size_t num);
+void far* memcpy(void far* dst, const void far* src, size_t num);
+void far* memset(void far* ptr, int value, size_t num);
+int memcmp(const void far* ptr1, const void far* ptr2, size_t num);
