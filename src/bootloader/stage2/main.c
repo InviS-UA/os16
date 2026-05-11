@@ -6,8 +6,8 @@
 #include "memory.h"
 #include "defs.h"
 
-uint8_t far* g_Kernel = (uint8_t far*)MEMORY_KERNEL_ADDR;
-uint8_t far* g_KernelLoadBuffer = (uint8_t far*)MEMORY_LOAD_ADDR;
+uint8_t __far* g_Kernel = (uint8_t __far*)MEMORY_KERNEL_ADDR;
+uint8_t __far* g_KernelLoadBuffer = (uint8_t __far*)MEMORY_LOAD_ADDR;
 
 typedef void (*KernelEntry)(uint16_t) __far;
 
@@ -27,9 +27,9 @@ void ASMFUNC cstart_(uint16_t bootDrive)
         goto end;
     }
 
-    FAT_File far* file = FAT_Open(&disk, "kernel.sys");
+    FAT_File __far* file = FAT_Open(&disk, "kernel.sys");
     uint32_t read;
-    uint8_t far* kernelBuffer = g_Kernel;
+    uint8_t __far* kernelBuffer = g_Kernel;
     printf("Loading KERNEL.SYS\r\n");
 
     while ((read = FAT_Read(&disk, file, MEMORY_LOAD_SIZE, g_KernelLoadBuffer)))

@@ -40,7 +40,7 @@ typedef struct
 } FAT_File;
 
 bool FAT_Init(DISK* disk);
-FAT_File far* FAT_Open(DISK* disk, const char* path);
-uint32_t FAT_Read(DISK* disk, FAT_File far* file, uint32_t size, void far* dataOut);
-bool FAT_ReadEntry(DISK* disk, FAT_File far* file, FAT_DirectoryEntry* entryOut);
-void FAT_Close(FAT_File far* file);
+FAT_File __far* FAT_Open(DISK* disk, const char* path);
+uint32_t FAT_Read(DISK* disk, FAT_File __far* file, uint32_t size, void __far* dataOut);
+bool FAT_ReadEntry(DISK* disk, FAT_File __far* file, FAT_DirectoryEntry* entryOut);
+void FAT_Close(FAT_File __far* file);

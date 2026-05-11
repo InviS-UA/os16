@@ -12,7 +12,7 @@ bool DISK_Init(DISK* disk, uint8_t driveNumber)
     return true;
 }
 
-bool DISK_ReadSectors(DISK* disk, uint64_t lba, uint16_t sectors, void far* dataOut)
+bool DISK_ReadSectors(DISK* disk, uint64_t lba, uint16_t sectors, void __far* dataOut)
 {
     x86_disk_dap dap = {
         .size = sizeof(x86_disk_dap),

@@ -60,8 +60,8 @@ typedef struct
     FAT_FileData OpenedFiles[MAX_FILE_HANDLES];
 } FAT_Data;
 
-static FAT_Data far* g_Data;
-static uint8_t far* g_Fat = NULL;
+static FAT_Data __far* g_Data;
+static uint8_t __far* g_Fat = NULL;
 static uint32_t g_DataSectionLBA;
 
 static bool FAT_ReadBootSector(DISK* disk)
@@ -76,7 +76,7 @@ static bool FAT_ReadFat(DISK* disk)
 
 bool FAT_Init(DISK* disk)
 {
-    g_Data = (FAT_Data far*)MEMORY_FAT_ADDR;
+    g_Data = (FAT_Data __far*)MEMORY_FAT_ADDR;
 
     // read boot sector
     if (!FAT_ReadBootSector(disk))
@@ -86,7 +86,7 @@ bool FAT_Init(DISK* disk)
     }
 
     // read FAT
-    g_Fat = (uint8_t far*)g_Data + sizeof(FAT_Data);
+    g_Fat = (uint8_t __far*)g_Data + sizeof(FAT_Data);
     uint32_t fatSize = g_Data->BS.BootSector.BytesPerSector * g_Data->BS.BootSector.SectorsPerFat;
 
     if (sizeof(g_Data) + fatSize >= MEMORY_FAT_SIZE)
@@ -140,7 +140,7 @@ static uint32_t FAT_NextCluster(uint32_t currentCluster)
 {
     uint32_t fatIndex = currentCluster * 2;
 
-    uint32_t nextCluster = *(uint16_t far*)(g_Fat + fatIndex);
+    uint32_t nextCluster = *(uint16_t __far*)(g_Fat + fatIndex);
 
     if (nextCluster >= 0xFFF8)
         nextCluster |= 0xFFFF0000;
@@ -148,7 +148,7 @@ static uint32_t FAT_NextCluster(uint32_t currentCluster)
     return nextCluster;
 }
 
-static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry* entry)
+static FAT_File __far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry* entry)
 {
     int handle = -1;
 
@@ -162,7 +162,7 @@ static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry* entry)
         return false;
     }
 
-    FAT_FileData far* fd = &g_Data->OpenedFiles[handle];
+    FAT_FileData __far* fd = &g_Data->OpenedFiles[handle];
 
     fd->Public.Handle = handle;
     fd->Public.Position = 0;
@@ -185,13 +185,13 @@ static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry* entry)
     return &fd->Public;
 }
 
-uint32_t FAT_Read(DISK* disk, FAT_File far* file, uint32_t size, void far* dataOut)
+uint32_t FAT_Read(DISK* disk, FAT_File __far* file, uint32_t size, void __far* dataOut)
 {
-    FAT_FileData far* fd = (file->Handle == ROOT_DIRECTORY_HANDLE)
+    FAT_FileData __far* fd = (file->Handle == ROOT_DIRECTORY_HANDLE)
         ? &g_Data->RootDirectory
         : &g_Data->OpenedFiles[file->Handle];
 
-    uint8_t far* u8DataOut = (uint8_t far*)dataOut;
+    uint8_t __far* u8DataOut = (uint8_t __far*)dataOut;
 
     if (!fd->Public.IsDirectory || (fd->Public.IsDirectory && fd->Public.Size > 0))
         size = min(size, fd->Public.Size - fd->Public.Position);
@@ -247,15 +247,15 @@ uint32_t FAT_Read(DISK* disk, FAT_File far* file, uint32_t size, void far* dataO
         }
     }
 
-    return u8DataOut - (uint8_t far*)dataOut;
+    return u8DataOut - (uint8_t __far*)dataOut;
 }
 
-bool FAT_ReadEntry(DISK* disk, FAT_File far* file, FAT_DirectoryEntry* entryOut)
+bool FAT_ReadEntry(DISK* disk, FAT_File __far* file, FAT_DirectoryEntry* entryOut)
 {
     return FAT_Read(disk, file, sizeof(FAT_DirectoryEntry), entryOut) == sizeof(FAT_DirectoryEntry);
 }
 
-void FAT_Close(FAT_File far* file)
+void FAT_Close(FAT_File __far* file)
 {
     if (file->Handle == ROOT_DIRECTORY_HANDLE)
     {
@@ -268,7 +268,7 @@ void FAT_Close(FAT_File far* file)
     }
 }
 
-bool FAT_FindFile(DISK* disk, FAT_File far* file, const char* name, FAT_DirectoryEntry* entryOut)
+bool FAT_FindFile(DISK* disk, FAT_File __far* file, const char* name, FAT_DirectoryEntry* entryOut)
 {
     char fatName[12];
     FAT_DirectoryEntry entry;
@@ -302,7 +302,7 @@ bool FAT_FindFile(DISK* disk, FAT_File far* file, const char* name, FAT_Director
     return false;
 }
 
-FAT_File far* FAT_Open(DISK* disk, const char* path)
+FAT_File __far* FAT_Open(DISK* disk, const char* path)
 {
     char name[MAX_PATH_SIZE];
 
@@ -310,7 +310,7 @@ FAT_File far* FAT_Open(DISK* disk, const char* path)
     if (path[0] == '/' || path[0] == '\\')
         path++;
 
-    FAT_File far* current = &g_Data->RootDirectory.Public;
+    FAT_File __far* current = &g_Data->RootDirectory.Public;
 
     while (*path)
     {

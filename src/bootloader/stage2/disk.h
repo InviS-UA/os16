@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "defs.h"
 
 typedef struct
 {
@@ -10,4 +9,4 @@ typedef struct
 } DISK;
 
 bool DISK_Init(DISK* disk, uint8_t driveNumber);
-bool DISK_ReadSectors(DISK* disk, uint64_t lba, uint16_t sectors, void far* dataOut);
+bool DISK_ReadSectors(DISK* disk, uint64_t lba, uint16_t sectors, void __far* dataOut);
