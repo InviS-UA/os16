@@ -3,7 +3,7 @@
 
 void __attribute__((section(".entry"))) kmain(uint16_t bootDrive)
 {
-    printf("Hello world from kernel!\r\n");
+    printf("Hello world from kernel!\n");
 
 end:
     for (;;);
