@@ -1,6 +1,6 @@
-ENTRY(entry)
+ENTRY(kmain)
 OUTPUT_FORMAT("binary")
-phys = 0x00000500;
+phys = 0x7E00;
 
 SECTIONS
 {

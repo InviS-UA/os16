@@ -1,6 +1,6 @@
 include scripts/config.mk
 
-.PHONY: all disk_image bootloader always clean
+.PHONY: all disk_image bootloader kernel always clean
 
 all: disk_image
 
@@ -9,7 +9,7 @@ all: disk_image
 #
 disk_image: $(BUILD_DIR)/disk_image.img
 
-$(BUILD_DIR)/disk_image.img: bootloader
+$(BUILD_DIR)/disk_image.img: bootloader kernel
 	@./scripts/make_disk.sh $@ $(MAKE_DISK_SIZE)
 	@echo "--> Created: " $@
 
@@ -27,6 +27,14 @@ stage2: $(BUILD_DIR)/stage2.bin
 
 $(BUILD_DIR)/stage2.bin: always
 	@$(MAKE) -C src/bootloader/stage2
+
+#
+# Kernel
+#
+kernel: $(BUILD_DIR)/kernel.sys
+
+$(BUILD_DIR)/kernel.sys: always
+	@$(MAKE) -C src/kernel
 
 #
 # Always

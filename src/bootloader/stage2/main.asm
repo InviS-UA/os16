@@ -3,9 +3,9 @@ bits 16
 section .entry
 
 extern cstart_
-global start
+global entry
 
-start:
+entry:
     ; store bootDrive from dl
     mov [boot_drive], dl
 

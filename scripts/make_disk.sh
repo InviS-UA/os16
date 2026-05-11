@@ -28,3 +28,4 @@ printf "%08x" ${STAGE2_SECTORS} | sed 's/\(..\)\(..\)\(..\)\(..\)/\4\3\2\1/' | x
 
 # copy files
 mcopy -i $TARGET -s ${IMAGE_DIR}/root/* ::/
+mcopy -i $TARGET ${BUILD_DIR}/kernel.sys "::/kernel.sys"

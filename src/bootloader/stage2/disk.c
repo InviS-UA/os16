@@ -1,5 +1,6 @@
 #include "disk.h"
 #include "x86.h"
+#include <stdio.h>
 
 bool DISK_Init(DISK* disk, uint8_t driveNumber)
 {

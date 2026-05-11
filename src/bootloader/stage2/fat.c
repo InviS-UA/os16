@@ -2,7 +2,6 @@
 #include <stddef.h>
 #include "memdefs.h"
 #include "stdio.h"
-#include "minmax.h"
 #include "memory.h"
 #include "ctype.h"
 #include "string.h"
@@ -141,7 +140,7 @@ static uint32_t FAT_NextCluster(uint32_t currentCluster)
 {
     uint32_t fatIndex = currentCluster * 2;
 
-    uint32_t nextCluster = *(uint16_t*)(g_Fat + fatIndex);
+    uint32_t nextCluster = *(uint16_t far*)(g_Fat + fatIndex);
 
     if (nextCluster >= 0xFFF8)
         nextCluster |= 0xFFFF0000;
@@ -149,7 +148,7 @@ static uint32_t FAT_NextCluster(uint32_t currentCluster)
     return nextCluster;
 }
 
-static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry far* entry)
+static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry* entry)
 {
     int handle = -1;
 
@@ -169,9 +168,11 @@ static FAT_File far* FAT_OpenEntry(DISK* disk, FAT_DirectoryEntry far* entry)
     fd->Public.Position = 0;
     fd->Public.Size = entry->Size;
     fd->Public.IsDirectory = (entry->Attributes & FAT_ATTR_DIRECTORY) != 0;
-    fd->FirstCluster = ((uint32_t)entry->FirstClusterHigh << 16) + entry->FirstClusterLow;
+    fd->FirstCluster = entry->FirstClusterLow + ((uint32_t)entry->FirstClusterHigh << 16);
     fd->CurrentCluster = fd->FirstCluster;
     fd->CurrentSectorInCluster = 0;
+
+    // printf("OpenEntry FirstCluster: %lx, CurrentCluster: %lx\r\n", fd->FirstCluster, fd->CurrentCluster);
 
     if (!DISK_ReadSectors(disk, FAT_ClusterToLBA(fd->CurrentCluster), 1, fd->Buffer))
     {
@@ -192,8 +193,10 @@ uint32_t FAT_Read(DISK* disk, FAT_File far* file, uint32_t size, void far* dataO
 
     uint8_t far* u8DataOut = (uint8_t far*)dataOut;
 
-    if (!fd->Public.IsDirectory)
+    if (!fd->Public.IsDirectory || (fd->Public.IsDirectory && fd->Public.Size > 0))
         size = min(size, fd->Public.Size - fd->Public.Position);
+
+    // printf("Read FirstCluster: %lx, CurrentCluster: %lx\r\n", fd->FirstCluster, fd->CurrentCluster);
 
     while (size > 0)
     {
@@ -247,7 +250,7 @@ uint32_t FAT_Read(DISK* disk, FAT_File far* file, uint32_t size, void far* dataO
     return u8DataOut - (uint8_t far*)dataOut;
 }
 
-bool FAT_ReadEntry(DISK* disk, FAT_File far* file, FAT_DirectoryEntry far* entryOut)
+bool FAT_ReadEntry(DISK* disk, FAT_File far* file, FAT_DirectoryEntry* entryOut)
 {
     return FAT_Read(disk, file, sizeof(FAT_DirectoryEntry), entryOut) == sizeof(FAT_DirectoryEntry);
 }
@@ -265,7 +268,7 @@ void FAT_Close(FAT_File far* file)
     }
 }
 
-bool FAT_FindFile(DISK* disk, FAT_File far* file, const char* name, FAT_DirectoryEntry far* entryOut)
+bool FAT_FindFile(DISK* disk, FAT_File far* file, const char* name, FAT_DirectoryEntry* entryOut)
 {
     char fatName[12];
     FAT_DirectoryEntry entry;
@@ -291,7 +294,7 @@ bool FAT_FindFile(DISK* disk, FAT_File far* file, const char* name, FAT_Director
     {
         if (memcmp(fatName, entry.Name, 11) == 0)
         {
-            *entryOut = entry;
+            memcpy(entryOut, &entry, sizeof(FAT_DirectoryEntry));
             return true;
         }
     }

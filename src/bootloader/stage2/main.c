@@ -1,9 +1,17 @@
 #include <stdint.h>
 #include "stdio.h"
 #include "disk.h"
+#include "memdefs.h"
 #include "fat.h"
+#include "memory.h"
+#include "defs.h"
 
-void _cdecl cstart_(uint16_t bootDrive)
+uint8_t far* g_Kernel = (uint8_t far*)MEMORY_KERNEL_ADDR;
+uint8_t far* g_KernelLoadBuffer = (uint8_t far*)MEMORY_LOAD_ADDR;
+
+typedef void (*KernelEntry)(uint16_t) __far;
+
+void ASMFUNC cstart_(uint16_t bootDrive)
 {
     DISK disk;
 
@@ -19,15 +27,21 @@ void _cdecl cstart_(uint16_t bootDrive)
         goto end;
     }
 
-    FAT_File far* file = FAT_Open(&disk, "test.txt");
-    char buff[100];
+    FAT_File far* file = FAT_Open(&disk, "kernel.sys");
+    uint32_t read;
+    uint8_t far* kernelBuffer = g_Kernel;
+    printf("Loading KERNEL.SYS\r\n");
 
-    uint32_t read = FAT_Read(&disk, file, sizeof(buff), buff);
-
-    for (int i = 0; i < read; i++)
-        putc(buff[i]);
+    while ((read = FAT_Read(&disk, file, MEMORY_LOAD_SIZE, g_KernelLoadBuffer)))
+    {
+        memcpy(kernelBuffer, g_KernelLoadBuffer, read);
+        kernelBuffer += read;
+    }
 
     FAT_Close(file);
+
+    KernelEntry entry = (KernelEntry)g_Kernel;
+    entry(bootDrive);
 
 end:
     for (;;);

@@ -7,15 +7,14 @@
                 "${workspaceFolder}/src/bootloader/stage2/**"
             ],
             "defines": [
-                "_cdecl=",
-                "far="
+                "__far="
             ],
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c99",
             "cppStandard": "gnu++17",
             "intelliSenseMode": "linux-gcc-x64",
             "compilerArgs": [
-                "-ffreestanding -nostdlib -mcmodel=small \"-D_cdecl=__attribute__((cdecl))\""
+                "-ffreestanding -nostdlib -mcmodel=small"
             ]
         }
     ],
